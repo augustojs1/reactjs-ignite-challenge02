@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { MovieCard } from "./MovieCard";
 import { api } from "../services/api";
 
@@ -30,17 +30,21 @@ export function Content({ selectedGenreId }: ContentProps) {
   );
 
   useEffect(() => {
-    api
-      .get<MovieProps[]>(`movies/?Genre_id=${selectedGenreId}`)
-      .then((response) => {
-        setMovies(response.data);
-      });
+    const fetchMovies = useCallback(async () => {
+      api
+        .get<MovieProps[]>(`movies/?Genre_id=${selectedGenreId}`)
+        .then((response) => {
+          setMovies(response.data);
+        });
 
-    api
-      .get<GenreResponseProps>(`genres/${selectedGenreId}`)
-      .then((response) => {
-        setSelectedGenre(response.data);
-      });
+      api
+        .get<GenreResponseProps>(`genres/${selectedGenreId}`)
+        .then((response) => {
+          setSelectedGenre(response.data);
+        });
+    }, []);
+
+    fetchMovies();
   }, [selectedGenreId]);
 
   return (
